@@ -1,47 +1,81 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Libro = require('../models/libro');
 
-//obtener documentos de BD mongo
+// Obtener todo los documentos directamente de la base de datos de mongo
 router.get('/',async(req,res)=>{
     try{
         const arrayLibrosDB = await Libro.find();
+        // console.log(arrayLibrosDB);
         res.json(arrayLibrosDB);
-    }catch(error){
+    } catch (error) {
         console.log(error);
     }
 });
 
-//obtener documentos de BD mongo
-router.get('/:id',async(req,res)=>{
+// Para obtener un solo libro de la base de datos
+router.get('/:id', async(req,res)=>{
     const id = req.params.id;
-    try{
+    try {
         const arrayLibrosDB = await Libro.find({isbn:id});
+        console.log(arrayLibrosDB)
         res.json(arrayLibrosDB);
-    }catch(error){
+
+    } catch (error) { 
         console.log(error);
     }
-});
+})
 
-router.post('/',async(rew,res)=>{
+// Para insertar un documento en la base de datos de Mongo
+router.post('/', async(req,res)=>{
     const body = req.body;
-    try{
+    try {
         await Libro.create(body);
-        res.json({estado:'Libro insertado exitosamente'})
-    }catch(error){
+        res.json({estado:"Libro insertsado exitosamente"});
+    } catch { 
         console.log(error);
     }
-});
+})
 
-router.delete('/:id',async(req,res)=>{
+// Para eliminar un documento en la base de datos de Mongo
+router.delete('/:id', async(req,res)=>{
     const id = req.params.id;
-    try{
+    try {
         const libroDB = await Libro.findOneAndDelete({isbn:id});
-        libroDB ? res.json({estado:true,mensaje:'Libro eliminado'}) : res.json({estado:false,mensaje:'No se elimino libro'})
-    }catch(error){
+        if(libroDB){
+            res.json({
+                estado:true,
+                mensaje:'libro eliminado'
+            })
+        } else {
+            res.json({
+                estado:false,
+                mensaje:'No se pudo eliminar el libro solicitado'
+            })
+        }
+    } catch (error) { 
         console.log(error);
     }
-});
+})
 
-module.exports = router;
+// Para actualizar un documento en la base de datos de Mongo
+router.put('/:id', async(req,res)=>{
+    const id = req.params.id;
+    const body = req.body;
+    try {
+        const libroDB = await Libro.findOneAndUpdate({isbn:id}, body, {useFindAndModify:false});
+        res.json({
+            estado:false,
+            mensaje:'El libro ha sido actualizado con exito'
+        })
+    } catch (error) { 
+        console.log(error);
+        res.json({
+            estado:false,
+            mensaje:'Los datos del libro no fueron actualizados'
+        })
+    }
+})
+
+
+module.exports=router;

@@ -1,11 +1,11 @@
 const express = require('express');
-const { dirname } = require('path');
-const app = express();
 const bodyParser = require('body-parser');
+const {dirname} = require('path');
 const port = 3000;
 
-// Esto es muy importante para el pase de datos entre los modulos y componentes
-app.use(bodyParser.urlencoded({extended:false}));
+const app = express();
+
+app.use(bodyParser,bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 // Configurar cabeceras y cors
@@ -17,17 +17,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// Generamos la conexiona a la base de datos
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://127.0.0.1:27017/biblio',
 {useNewUrlParser:true, useUnifiedTopology:true})
-.then(()=>console.log('Base de datos de MongoDB conectada correctamente'))
+.then(()=>console.log('Base de datos conectada'))
 .catch(e=>console.log(e));
 
-// Rutas de la api
-app.use('/libros', require('./router/Libros'))
 
-app.listen(port, ()=>{
-    console.log('El servidor esta escuchando por el puerto: ', port)
-    // console.log('La direccion del servidor es: ', __dirname)
-});
+app.use('/libros',require('./router/Libros'));
+
+app.listen(port, () => console.log(`Server running on port ${port}`));
+
